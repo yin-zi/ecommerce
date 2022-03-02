@@ -270,3 +270,12 @@ class FavoriteView(LoginRequiredMixin, View):
 
     def post(request):
         return HttpResponse('post 用户收藏')
+
+
+class UsernameCountView(View):
+    def get(self, request, username):
+        count = User.objects.filter(username=username).count()
+        return JsonResponse({'code': 0, 'count': count, 'msg': 'ok'})
+
+class View(View):
+    pass

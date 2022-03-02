@@ -29,10 +29,10 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'user.apps.UserConfig',
-    'cart.apps.CartConfig',
-    'order.apps.OrderConfig',
-    'goods.apps.GoodsConfig',
+    'apps.user.apps.UserConfig',
+    'apps.cart.apps.CartConfig',
+    'apps.order.apps.OrderConfig',
+    'apps.goods.apps.GoodsConfig',
     'tinymce',
     'haystack',
     'django.contrib.admin',
@@ -148,6 +148,13 @@ EMAIL_USE_SSL = True  # 与 SMTP 服务器对话使用隐式 TLS（安全）连�
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "session": {
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://localhost:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -155,7 +162,7 @@ CACHES = {
     },
     "history": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/3",
+        "LOCATION": "redis://localhost:6379/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -163,15 +170,15 @@ CACHES = {
 }
 # django-redis 作为session后端配置
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+SESSION_CACHE_ALIAS = "session"
 
 # celery配置
-CELERY_BROKER_URL = 'redis://localhost:6379/2'
+CELERY_BROKER_URL = 'redis://localhost:6379/3'
 CELERY_TIMEZONE = "Asia/Shanghai"
 # Only add pickle to this list if your broker is secured from unwanted access (see userguide/security.html)
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/2'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/3'
 
 # FastDFS分布式文件系统配置
 DEFAULT_FILE_STORAGE = 'utils.fdfs.storage.FDFSStorage'  # 配置文件存储类
@@ -188,11 +195,55 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'  # 当添加 修改 删除数据时，自动生成索引
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5  # 控制搜索结果每页显示的数量
 
+# 日志
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # 是否禁用已经存在的日志记录器
+    'formatters': {  # 日志信息的文本格式
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {module} {lineno} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {  # 在日志记录从logger传到handler的过程中进行过滤
+        'require_debug_true': {  # django在debug模式下才输出日志
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {  # 处理logger中每一条消息的引擎
+        'console': {  # 向终端输出日志
+            'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file': {  # 向文件输出日志
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs/debug.log',
+            'formatter': 'verbose',
+            'maxBytes': 100 * 1024 * 1024,  # 日志文件大小100M
+            'backupCount': 3,  # 日志备份文件个数
+        },
+    },
+    'loggers': {  # 日志系统的入口
+        'django': {
+            'handlers': ['console', 'file'],  # 同时向终端和文件输出日志
+            'level': 'WARNING',  # 日志记录器接收的日志最低级别
+            'propagate': True,  # 是否继续传递日志信息
+        },
+    },
+}
+
 """
 # 其它命令
 python manage.py makemigration
 python manage.py migrate
-python manage.py rebuild_index  # 生成索引文件
+python manage.py rebuild_index  #重建索引文件
 
 # 启动项目
 sudo fdfs_trackerd /etc/fdfs/tracker.conf restart  # 启动tracker
@@ -214,4 +265,6 @@ qoqamp8198@sandbox.com
 用户中心-全部订单-待评价按钮 多个订单按钮均指向第一个待评价订单 也会导致重复评价问题
 搜索页面购物车 不显示数量
 搜索页面 商品分类不显示
+
+django-cors-headers
 """

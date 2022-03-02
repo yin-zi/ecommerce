@@ -15,6 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.usls import register_converter
+from utils.converters import UsernameConverter
+
+
+register_converter(UsernameConverter, 'username')
 
 
 urlpatterns = [
