@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'apps.cart.apps.CartConfig',
     'apps.order.apps.OrderConfig',
     'apps.goods.apps.GoodsConfig',
+    'apps.captcha.apps.CaptchaConfig',
     'tinymce',
     'haystack',
     'django.contrib.admin',
@@ -167,6 +168,13 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+    "captcha": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
 # django-redis 作为session后端配置
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -223,7 +231,7 @@ LOGGING = {
         },
         'file': {  # 向文件输出日志
             'level': 'WARNING',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.RotatingFileHandler',
             'filename': BASE_DIR / 'logs/debug.log',
             'formatter': 'verbose',
             'maxBytes': 100 * 1024 * 1024,  # 日志文件大小100M
@@ -250,7 +258,7 @@ sudo fdfs_trackerd /etc/fdfs/tracker.conf restart  # 启动tracker
 sudo fdfs_storaged /etc/fdfs/storage.conf restart  # 启动storage
 sudo /usr/local/nginx/sbin/nginx  # 启动nginx
 redis-server
-celery -A ecommerce worker -l INFO -P eventlet
+celery -A ecommerce worker -l INFO -P eventlet  # Linux运行无需-P及其参数
 py manage.py runserver [::]:8469
 
 # 支付宝沙箱账号密码
@@ -259,12 +267,6 @@ qoqamp8198@sandbox.com
 
 # todo:fix-bug
 首页焦点图 只有一张会左右切换会有白屏
-商品详情页 立即购买 加入购物车 按钮超出区域
-商品详情页 立即购买 按钮点击无效
-支付接口 同步查询问题
-用户中心-全部订单-待评价按钮 多个订单按钮均指向第一个待评价订单 也会导致重复评价问题
-搜索页面购物车 不显示数量
-搜索页面 商品分类不显示
 
-django-cors-headers
+商品详情页 立即购买 按钮点击不跳转(考虑是否删除此按钮
 """

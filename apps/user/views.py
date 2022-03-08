@@ -9,10 +9,11 @@ from django_redis import get_redis_connection
 from itsdangerous.url_safe import URLSafeTimedSerializer
 from itsdangerous.exc import SignatureExpired
 import re
+
 from .tasks import send_register_active_email
 from .models import User, Address
-from goods.models import GoodsSKU, GoodsImage
-from order.models import OrderInfo, OrderGoods
+from apps.goods.models import GoodsSKU, GoodsImage
+from apps.order.models import OrderInfo, OrderGoods
 
 
 class RegisterView(View):
@@ -30,9 +31,15 @@ class RegisterView(View):
         confirm_pwd = request.POST.get('confirm_pwd')
         email = request.POST.get('email')
         allow = request.POST.get('allow')
+        captcha_uuid = request.POST.get('captcha_uuid')
+        captcha = request.POST.get('captcha')
         # 进行数据的校验
-        if not all([username, password, email]):  # 数据不完整
+        if not all([username, password, email, captcha_uuid, captcha]):  # 数据不完整
             return render(request, 'register.html', {'errmsg': '数据不完整'})
+        redis_cli = get_redis_connection('captcha')
+        captcha_ans = redis_cli.get(captcha_uuid).decode()
+        if captcha_ans != captcha:
+            return render(request, 'register.html', {'errmsg': '验证码错误'})
         if password != confirm_pwd:
             return render(request, 'register.html', {'errmsg': '两次输入的密码不一致'})
         # 邮箱校验
@@ -47,12 +54,11 @@ class RegisterView(View):
             user = None
         if user:  # 用户名已存在
             return render(request, 'register.html', {'errmsg': '用户名已存在'})
-        # 进行业务处理 进行用户注册
+        # 业务处理 用户注册 使用create_user函数password才会加密保存
         user = User.objects.create_user(username, email, password)
         user.is_active = 0  # 将用户设置为未激活状态
         user.save()
-        # 发送激活邮件到/user/active/包含用户身份的加密token
-        # 加密用户的身份信息 生成激活token
+        # 发送激活邮件到/user/active/ 加密用户的身份信息 生成激活token
         serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
         token = serializer.dumps(user.id)
         # 异步发送邮件
@@ -122,7 +128,6 @@ class LoginView(View):
         return render(request, 'login.html', {'errmsg': '用户名或密码错误'})
 
 
-# /user/logout
 class LogoutView(View):
     """退出登录视图"""
 
@@ -131,7 +136,6 @@ class LogoutView(View):
         return redirect(reverse('goods:index'))  # 跳转到首页
 
 
-# /user
 class ProfileView(LoginRequiredMixin, View):
     """用户中心-信息页"""
 
@@ -141,9 +145,8 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request):
         """显示用户信息"""
         # request.user.is_authenticate()
-        # 如果用户未登录->AnonymousUser类的一个实例
-        # 如果用户登录->User类的一个实例
-        # 除了你给模板文件传递的模板变量之外，django框架会把request.user也传递给模板
+        # 用户未登录->AnonymousUser类的一个实例 用户登录->User类的一个实例
+        # django框架会把request.user也传递给模板
         # 获取用户个人信息
         user = request.user
         address = Address.objects.get_default_address(user)
@@ -157,12 +160,16 @@ class ProfileView(LoginRequiredMixin, View):
         for sku_id in sku_ids:
             try:
                 goods = GoodsSKU.objects.get(id=sku_id, is_delete=False)
+                goods.images = GoodsImage.objects.filter(sku_id=sku_id)
             except GoodsSKU.DoesNotExist:
+                pass
+            except GoodsImage.DoesNotExist:
                 pass
             else:
                 goods_li.append(goods)
         # 组织上下文
         context = {
+            'page': 'user',
             'user': user,
             'address': address,
             'goods_li': goods_li,
@@ -216,6 +223,7 @@ class UserOrderView(LoginRequiredMixin, View):
 
         # 组织上下文
         context = {
+            'page': 'order',
             'order_page': order_page,
             'pages': pages,
         }
@@ -268,14 +276,3 @@ class FavoriteView(LoginRequiredMixin, View):
     def get(request):
         return HttpResponse('get 用户收藏')
 
-    def post(request):
-        return HttpResponse('post 用户收藏')
-
-
-class UsernameCountView(View):
-    def get(self, request, username):
-        count = User.objects.filter(username=username).count()
-        return JsonResponse({'code': 0, 'count': count, 'msg': 'ok'})
-
-class View(View):
-    pass

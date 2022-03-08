@@ -15,19 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.usls import register_converter
-from utils.converters import UsernameConverter
+# from django.urls import register_converter
+# from utils.converters import UsernameConverter
 
 
-register_converter(UsernameConverter, 'username')
+# register_converter(UsernameConverter, 'username')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
-    path('search', include('haystack.urls')),  # 全文检索框架
-    path('', include('goods.urls'), name='goods'),  # 商品模块
-    path('cart/', include('cart.urls'), name='cart'),  # 购物车模块
-    path('order/', include('order.urls'), name='order'),  # 订单模块
-    path('user/', include('user.urls'), name='user'),  # 用户模块
+    path('', include('apps.goods.urls'), name='goods'),  # 商品模块
+    path('cart/', include('apps.cart.urls'), name='cart'),  # 购物车模块
+    path('order/', include('apps.order.urls'), name='order'),  # 订单模块
+    path('user/', include('apps.user.urls'), name='user'),  # 用户模块
+    path('captcha/', include('apps.captcha.urls'), name='captcha'),
 ]

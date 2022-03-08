@@ -10,7 +10,7 @@
             <li><span>生日：</span>{{ user.birthday }}</li>
             {% if address %}
                 <li><span>联系方式：</span>{{ address.phone }}</li>
-                <li><span>联系地址：</span>{{ address.addr }}</li>
+                <li><span>联系地址：</span>{{ address.address }}</li>
             {% else %}
                 <li><span>联系方式：</span>无默认</li>
                 <li><span>联系地址：</span>无默认</li>
@@ -23,12 +23,17 @@
         <ul class="goods_type_list clearfix">
             {% for goods in goods_li %}
                 <li>
-                    <a href="{% url 'goods:detail' goods.id %}"><img src="{{ goods.image.url }}"></a>
-                    <h4><a href="{% url 'goods:detail' goods.id %}">{{ goods.name }}</a></h4>
+                    <a href="{% url 'goods:detail' goods.spu.id goods.id %}">
+                        {% for goods_img in goods.images %}
+                        {% if forloop.counter == 1 %}
+                        <img src="{{ goods_img.image.url }}">
+                        {% endif %}
+                        {% endfor %}
+                    </a>
+                    <h4><a href="{% url 'goods:detail' goods.spu.id goods.id %}">{{ goods.name }}</a></h4>
                     <div class="operate">
                         <span class="prize">￥{{ goods.price }}</span>
-                        <span class="unit">{{ goods.price }}/{{ goods.unite }}</span>
-                        <a href="#" class="add_goods" title="加入购物车"></a>
+                        <span class="unit">{{ goods.unite }}</span>
                     </div>
                 </li>
             {% empty %}

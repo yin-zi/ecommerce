@@ -55,40 +55,43 @@
             let status = $(this).attr('status');
             if (status == 1) {
                 $(this).text('去支付');
+
+                let order_id = $(this).attr('order_id');
+                let csrf = $("input[name='csrfmiddlewaretoken']").val();
+                let params = {'order_id': order_id, 'csrfmiddlewaretoken': csrf}
+
+                $(this).click(function () {
+                    // 发起Ajax post请求,访问/order/pay,传递参数order_id
+                    $.post('/order/pay', params, function (data) {
+                        if (data.res == 3) {  // 引导用户到支付页面
+                            // window.open(data.pay_url);
+                            location.href = data.pay_url;
+                        } else {
+                            // alert(data.errmsg);
+                        }
+                    });
+                });
+
+                // 浏览器访问/order/check 获取支付交易的结果 Ajax post /order/check
+                $.post('/order/check', params, function (data) {
+                    if (data.res == 3) {
+                        // alert('支付成功');
+                        location.reload();  // 刷新页面
+                    } else {
+                        // alert(data.errmsg);
+                    }
+                });
+                
             } else if (status == 4) {
                 $(this).text('去评价');
+                $(this).click(function () {  // 跳转到评论页面
+                    let order_id = $(this).attr('order_id');
+                    location.href = '/order/comment/' + order_id;
+                });
             } else if (status == 5) {
                 $(this).text('已完成');
             }
         });
-        // 获取订单id
-        let order_id = $('.oper_btn').attr('order_id');
-        $('.oper_btn').click(function () {
-            let status = $(this).attr('status');
-            if (status == 1) {
-                let csrf = $("input[name='csrfmiddlewaretoken']").val();
-                let params = {'order_id': order_id, 'csrfmiddlewaretoken': csrf}
-                // 发起Ajax post请求,访问/order/pay,传递参数order_id
-                $.post('/order/pay', params, function (data) {
-                    if (data.res == 3) {  // 引导用户到支付页面
-                        window.open(data.pay_url);
-                        // 浏览器访问/order/check 获取支付交易的结果 Ajax post /order/check
-                        $.post('/order/check', params, function (data) {
-                            if (data.res == 3) {
-                                alert('支付成功');
-                                location.reload();  // 刷新页面
-                            } else {
-                                alert(data.errmsg);
-                            }
-                        });
-                    } else {
-                        alert(data.errmsg);
-                    }
-                });
-            } else if (status == 4) {
-                // 跳转到评论页面
-                location.href = '/order/comment/' + order_id;
-            }
-        });
+        
     </script>
 {% endblock bottomfiles %}

@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import View
 from django_redis import get_redis_connection
-from goods.models import GoodsSKU, GoodsImage
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from apps.goods.models import GoodsSKU, GoodsImage
 
 
 # 添加到购物车
@@ -11,7 +12,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # 涉及数据的修改（增删改查），采用post
 # 涉及数据的获取，采用get
 # 2.传递参数：商品id（sku_id） 商品数量（count）
-# ajax发起的请求都在后台，在浏览器中看不到效果，因此不能使用mixin
 
 class CartInfoView(LoginRequiredMixin, View):
     """购物车页面显示"""
@@ -37,7 +37,6 @@ class CartInfoView(LoginRequiredMixin, View):
             sku.images = GoodsImage.objects.filter(sku=sku, is_delete=False)
             # 计算商品的小计 动态给sku对象增加一个属性amount
             sku.amount = sku.price * int(count)
-            print(sku.amount)
             # 动态给sku对象增加一个属性count,保存购物车中对应商品的数量
             sku.count = int(count)
             skus.append(sku)
@@ -55,7 +54,7 @@ class CartInfoView(LoginRequiredMixin, View):
         return render(request, 'cart.html', context)
 
 
-class CartAddView(View):
+class CartAddView(LoginRequiredMixin, View):
     """购物车记录添加"""
 
     def post(self, request):
@@ -111,7 +110,7 @@ class CartAddView(View):
 
 # 采用ajax post请求
 # 前端需要传递的参数：商品id(sku_id),更新的商品数量(amount)
-class CartUpdateView(View):
+class CartUpdateView(LoginRequiredMixin, View):
     """购物车记录更新"""
 
     def post(self, request):
@@ -156,9 +155,10 @@ class CartUpdateView(View):
         # 返回应答
         return JsonResponse({'res': 5, 'total_count': total_count, 'message': '添加成功'})
 
+
 # 采用ajax post请求
 # 前端需要传递的参数：商品id(sku_id)
-class CartDeleteView(View):
+class CartDeleteView(LoginRequiredMixin, View):
     """购物车记录删除"""
 
     def post(self, request):

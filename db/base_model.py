@@ -7,10 +7,6 @@ class BaseModel(models.Model):
     update_time = models.DateTimeField(auto_now=True, verbose_name='更新时间')
     is_delete = models.BooleanField(default=False, verbose_name='是否删除')
 
-    def delete(self, *args, **kwargs):
-        self.is_delete = True
-        self.save()
-
     class Meta:
         # 说明是一个抽象类
         abstract = True

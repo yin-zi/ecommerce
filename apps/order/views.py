@@ -5,11 +5,12 @@ from django.urls import reverse
 from django.views.generic import View
 from django_redis import get_redis_connection
 from datetime import datetime
-from .models import OrderInfo, OrderGoods
 from alipay import AliPay
 from django.contrib.auth.mixins import LoginRequiredMixin
-from goods.models import GoodsSKU, GoodsImage
-from user.models import Address
+
+from apps.order.models import OrderInfo, OrderGoods
+from apps.goods.models import GoodsSKU, GoodsImage
+from apps.user.models import Address
 
 
 class OrderPlaceView(LoginRequiredMixin, View):
@@ -78,10 +79,66 @@ class OrderPlaceView(LoginRequiredMixin, View):
         return render(request, 'place_order.html', context)
 
 
+class BuyPlaceView(LoginRequiredMixin, View):
+    """提交订单页面显示"""
+
+    def post(self, request):
+        # 获取登录的用户
+        user = request.user
+        sku_id = request.POST.get('sku_id')
+        count = request.POST.get('count')
+        count = int(count)
+
+        # 检验参数
+        if (not sku_id) and count <= 0:  # 跳转到购物车页面
+            return redirect(reverse('cart:show'))
+
+        skus = []
+        total_count = 0
+        total_price = 0
+        # 根据商品的id获取商品的信息
+        sku = GoodsSKU.objects.get(id=sku_id)
+        sku.image = GoodsImage.objects.filter(sku=sku, is_delete=False)[0]
+        # 计算商品的小计
+        amount = sku.price * count
+        # 动态给sku增加属性count，保存购买商品的数量
+        sku.count = count
+        sku.amount = amount
+        # 累加计算商品的总件数和总价格
+        total_count += count
+        total_price += amount
+        # 追加
+        skus.append(sku)
+
+        # 运费 实际开发的时候 属于一个子系统
+        transit_price = 5  # 此处写死
+
+        # 实付款
+        total_pay = total_price + transit_price
+
+        # 获取用户的收件地址
+        addrs = Address.objects.filter(user=user)
+
+        # 组织上下文
+        context = {
+            'skus': skus,
+            'total_count': total_count,
+            'total_price': total_price,
+            'transit_price': transit_price,
+            'total_pay': total_pay,
+            'addrs': addrs,
+            'sku_ids': sku_id,
+        }
+
+        # 使用模板
+        return render(request, 'place_order.html', context)
+
+
 class OrderCommitView(LoginRequiredMixin, View):
     """订单创建
     mysql事务,一组sql操作,要么都成功,要么都失败
     乐观锁,查询数据的时候不加锁，在更新时进行判断
+    注意要配合数据库隔离级别使用
     """
 
     @transaction.atomic
@@ -212,7 +269,7 @@ class OrderCommitView(LoginRequiredMixin, View):
 
 
 """悲观锁
-class OrderCommitView(View):
+class OrderCommitView(LoginRequiredMixin, View):
     @transaction.atomic
     def post(self, request):
         # 校验用户是否登录
@@ -369,7 +426,7 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsqovQPv/1rPEf178Brxf9Zti9l6WZz6xzUGX
             out_trade_no=order_id,  # 订单id
             total_amount=str(total_pay),  # 支付总金额
             subject="天天图书%s" % order_id,
-            return_url=None,
+            return_url="http://127.0.0.1:8000/user/order/1",
             notify_url=None  # 可选 不填则使用默认notify url
         )
 
@@ -437,7 +494,6 @@ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsqovQPv/1rPEf178Brxf9Zti9l6WZz6xzUGX
             elif code == '40004' or (code == '10000' and response.get('trade_status') == 'WAIT_BUYER_PAY'):
                 # 等待买家付款
                 if cnt == 3:
-                    print(response)
                     return JsonResponse({'res': 5, 'errmsg': '查询超时'})
                 cnt += 1
                 import time

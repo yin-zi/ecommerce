@@ -4,12 +4,14 @@ from django.views.generic import View
 from django_redis import get_redis_connection
 from django.core.cache import cache
 from django.core.paginator import Paginator
+from haystack.generic_views import SearchView
+
 from .models import GoodsType, GoodsSKU, GoodsSPU, GoodsImage, IndexGoodsBanner, IndexPromotionBanner
-from order.models import OrderGoods
+from apps.order.models import OrderGoods
 
 
 class IndexView(View):
-    """首页视图 http://127.0.0.1:8000"""
+    """首页视图"""
     def get(self, request):
         # 从缓存中获取首页
         context = cache.get('index_page_cache')
@@ -77,10 +79,11 @@ class DetailView(View):
             cart_count = conn.hlen(cart_key)
 
             # 添加用户的历史浏览记录
-            # history_key = 'history_%d' % user.id
-            # conn.lrem(history_key, 0, goods_id)  # 移除列表中的goods_id
-            # conn.lpush(history_key, goods_id)  # 插入goods_id到列表的左侧
-            # conn.ltrim(history_key, 0, 4)  # 对列表进行裁剪 只保存5条浏览记录
+            conn = get_redis_connection('history')
+            history_key = 'history_%d' % user.id
+            conn.lrem(history_key, 0, sku_id)  # 移除列表中的sku_id
+            conn.lpush(history_key, sku_id)  # 插入sku_id到列表的左侧
+            conn.ltrim(history_key, 0, 4)  # 对列表进行裁剪 只保存5条浏览记录
 
         context = {
             'goods_types': goods_types,
@@ -139,7 +142,6 @@ class ListView(View):
 
         # 获取新品的信息
         new_skus = GoodsSKU.objects.filter(spu__type=goods_type, is_delete=False).order_by('-create_time')[:2]
-        print(new_skus)
         for n_s in new_skus:
             n_s.images = GoodsImage.objects.filter(sku=n_s, is_delete=False)
         # 获取用户购物车中的商品数目
@@ -159,3 +161,20 @@ class ListView(View):
             'cart_count': cart_count,
         }
         return render(request, 'list.html', context)
+
+
+class GoodsSearchView(SearchView):
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        goods_types = GoodsType.objects.filter(is_delete=False)
+        context.setdefault('goods_types', goods_types)
+        # 获取用户购物车中的商品数目
+        user = self.request.user
+        cart_count = 0
+        if user.is_authenticated:  # 用户已登录
+            conn = get_redis_connection('default')
+            cart_key = 'cart_%d' % user.id
+            cart_count = conn.hlen(cart_key)
+        context.setdefault('cart_count', cart_count)
+        return context

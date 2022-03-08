@@ -1,6 +1,6 @@
 # 定义索引类
 from haystack import indexes
-from goods.models import GoodsSKU  # 导入模型类
+from apps.goods.models import GoodsSKU  # 导入模型类
 
 
 # 指定对于某个类的某些数据建立索引

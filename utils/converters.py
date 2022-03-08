@@ -6,3 +6,6 @@ class UsernameConverter:
 
 	def to_python(self, value):
 		return value
+
+	def to_value(self, value):
+		return value

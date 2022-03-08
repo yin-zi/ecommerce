@@ -88,7 +88,7 @@ html,body{height:100%}
 .navlist .interval{margin:0 15px;}
 
 
-.center_con{width:1200px;height:300px;margin:0 auto;}
+.center_con{width:1200px;height:315px;margin:0 auto;}
 .subnav{width:198px;height:300px;border-left:1px solid #eee;border-right:1px solid #eee;}
 .subnav li{height:44px;border-bottom:1px solid #eee;background:url(../images/icons.png) 178px -257px no-repeat #fff;}
 
@@ -104,7 +104,7 @@ html,body{height:100%}
 .subnav li .history{background:url(../images/icons.png) 28px -220px no-repeat;}
 
 
-.slide{width:760px;height:300px;position:relative;overflow:hidden;}
+.slide{width:760px;height:315px;position:relative;overflow:hidden;}
 .slide .slide_pics{position:relative;left:0;top:0;width:760px;height:300px;}
 .slide .slide_pics li{width:760px;height:300px;position:absolute;left:0;top:0}
 .slide .prev,.slide .next{width:17px;height:23px;background:url(../images/icons.png) left -388px no-repeat;position:absolute;left:11px;top:122px;cursor:pointer;}
@@ -113,7 +113,7 @@ html,body{height:100%}
 .points li{display:inline-block;width:11px;height:11px;margin:0 5px;background-color:#9f9f9f;border-radius:50%;cursor:pointer;}
 .points li.active{background-color:#cecece}
 
-.adv{width:240px;height:270px; overflow:hidden; background-color:gold;}
+.adv{width:240px;height:315px; overflow:hidden; background-color:rgb(250,100,83);}
 .adv a{display:block;float:left;}
 
 
@@ -229,7 +229,7 @@ html,body{height:100%}
 /* 商品详情样式 */
 .goods_detail_con{
 	width:1198px;
-	height:398px;
+	height:450px;
 	border:1px solid #ededed;
 	margin:0 auto 20px;
 }
@@ -279,7 +279,7 @@ html,body{height:100%}
 
 .login_top{width:960px;height:130px;margin:0 auto;}
 .login_logo{display:block;width:193px;height:76px;margin-top:30px;}
-.login_form_bg{height:480px;background-color: navajowhite;}
+.login_form_bg{height:480px;background-color: #5c6bc0;}
 .no-mp{margin-top:0px;}
 .login_form_wrap{width:960px;height:480px;margin:0 auto;}
 .login_banner{width:381px;height:322px;background:url(../images/login_banner.png) no-repeat;margin-top:90px;}
@@ -289,7 +289,7 @@ html,body{height:100%}
 .login_title{height:60px;width:308px;margin:10px auto;border-bottom:1px solid #e0e0e0;}
 
 .login_title h1{font-size:24px;height:60px;line-height:60px;color:#a8a8a8;float:left;font-weight:bold;margin-left:44px;}
-.login_title a{width:100px;height:20px;display:block;font-size:16px;color:#5fb42a;text-indent:26px;background:url(../images/icons02.png) left 5px no-repeat;float:left;margin:20px 0 0 36px}
+.login_title a{width:100px;height:20px;display:block;font-size:16px;color:#d32f2f;text-indent:26px;background:url(../images/icons02.png) left 5px no-repeat;float:left;margin:20px 0 0 36px}
 
 .form_input{width:308px;height:250px;margin:20px auto;position:relative;}
 .name_input,.pass_input{width:306px;height:36px;border:1px solid #e0e0e0;background:url(../images/icons02.png) 280px -41px no-repeat #f8f8f8;outline:none;font-size:14px;text-indent:10px;position: absolute;left:0;top:0}
@@ -306,7 +306,7 @@ html,body{height:100%}
 .more_input a{float:right;color:#666}
 .more_input a:hover{color:#ff8800}
 
-.input_submit{width:100%;height:40px;position:absolute;left:0;top:180px;background-color:#47aa34;color:#fff;font-size:22px;border:0px;font-family:'Microsoft Yahei';cursor:pointer;}
+.input_submit{width:100%;height:40px;position:absolute;left:0;top:180px;background-color:#d32f2f;color:#fff;font-size:22px;border:0px;font-family:'Microsoft Yahei';cursor:pointer;}
 
 
 /* 注册页面 */
@@ -326,7 +326,7 @@ html,body{height:100%}
 .r_con{width:400px;}
 .reg_title{width:360px;height:50px;float:left;margin-left:30px;border-bottom:1px solid #e0e0e0}
 .reg_title h1{height:50px;line-height:50px;float:left;font-size:24px;color:#a8a8a8;font-weight:bold;}
-.reg_title a{float:right;height:20px;line-height:20px;font-size:16px;color:#5fb42a;padding-right:20px;background:url(../images/icons02.png) 35px 3px no-repeat;margin-top:15px}
+.reg_title a{float:right;height:20px;line-height:20px;font-size:16px;color:#d32f2f;padding-right:20px;background:url(../images/icons02.png) 35px 3px no-repeat;margin-top:15px}
 
 .reg_form{width:360px;margin:30px 0 0 30px;float:left;position:relative;}
 .reg_form li{height:70px;}
@@ -334,7 +334,7 @@ html,body{height:100%}
 .reg_form li input{width:288px;height:38px;border:1px solid #e0e0e0;float:left;outline:none;text-indent:10px;background-color:#f8f8f8}
 .reg_form li.agreement input{width:15px;height:15px;float:left;margin-top:13px}
 .reg_form li.agreement label{width:300px;float:left;margin-left:10px;}
-.reg_form li.reg_sub input{width:360px;height:40px;background-color:#47aa34;font-size:18px;color:#fff;font-family:'Microsoft Yahei';cursor:pointer;}
+.reg_form li.reg_sub input{width:360px;height:40px;background-color:#d32f2f;font-size:18px;color:#fff;font-family:'Microsoft Yahei';cursor:pointer;}
 .reg_form li .error_tip{float:left;height:30px;line-height:30px;margin-left:70px;color:#e62e2e;display:none;}
 .reg_form li .error_tip2{float:left;height:20px;line-height:20px;color:#e62e2e;display:none;}
 
@@ -544,7 +544,7 @@ html,body{height:100%}
 	background-color:#f9f9f9;
 	margin:10px 0 15px;
 	padding:10px 0;
-	height:90px;
+	height:180px;
 }
 
 .user_info_list li{

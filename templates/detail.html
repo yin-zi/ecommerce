@@ -24,7 +24,9 @@
 			<div class="prize_bar">
 				<span class="show_price">¥<em>{{ sku.price }}</em></span>
 				<span class="show_unit">单  位：{{ sku.unite }}</span>
+                &nbsp;&nbsp;&nbsp;
                 <span>库存：{{ sku.stock }}</span>
+                &nbsp;&nbsp;&nbsp;
                 <span>销量：{{ sku.sales }}</span>
 			</div>
 			
@@ -47,11 +49,11 @@
                     <input type="text" class="num_show fl" value="1">
                     <a href="javascript:;" class="add fr">+</a>
                     <a href="javascript:;" class="minus fr">-</a>   
-                </div> 
+                </div>
             </div>
 			<div class="operate_btn">
                 {% csrf_token %}
-				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" sku_id="{{ sku.id }}" class="buy_btn" id="buy_btn">立即购买</a>
 				<a href="javascript:;" sku_id="{{ sku.id }}" class="add_cart" id="add_cart">加入购物车</a>
 			</div>
 		</div>
@@ -80,7 +82,7 @@
 
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
-				<li id="tag_detail" class="active">商品介绍</li>
+				<li id="tag_detail" class="active">商品信息</li>
 				<li id="tag_comment">商品评价</li>
 			</ul>
 
@@ -88,10 +90,12 @@
 
 				<dl>
                     
-                    <dt>商品详情：</dt>
+                    <dt>商品介绍：</dt>
                     {% for k, v in spu.desc.items %}
                     <p>{{ k }} :  {{ v }}</p>
                     {% endfor %}
+                    <hr color="red">
+                    <dt>商品详情：</dt>
 					<dd>{{ spu.detail|safe }}</dd>
 				</dl>
 			</div>
@@ -213,6 +217,17 @@
                     alert(data.errmsg);
                 }
             });
+		})
+
+        $('#buy_btn').click(function(){
+		    // 获取商品id和商品数量
+            let sku_id = $(this).attr('sku_id');
+            let count = $('.num_show').val();
+            let csrf = $('input[name="csrfmiddlewaretoken"]').val();
+            // 组织参数
+            let params = {'sku_id': sku_id, 'count': count, 'csrfmiddlewaretoken': csrf};
+		    // 发起ajax post请求 访问/cart/add 传递参数sku_id count
+            $.post('/order/buy', params);
 		})
 	</script>
 {% endblock bottomfiles %}
