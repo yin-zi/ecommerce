@@ -1,4 +1,4 @@
-{# 用户中心三个页面 #}
+{# 用户中心四个页面 #}
 {% extends 'base_no_cart.html' %}
 {% block title %}天天图书-用户中心{% endblock title %}
 {% block page_title %}用户中心{% endblock page_title %}
@@ -9,6 +9,7 @@
         <ul>
             <li><a href="{% url 'user:profile' %}" {% if page == 'user' %}class="active"{% endif %}>· 个人信息</a></li>
             <li><a href="{% url 'user:order' 1 %}" {% if page == 'order' %}class="active"{% endif %}>· 全部订单</a></li>
+            <li><a href="{% url 'user:favorite' 1 %}" {% if page == 'favorite' %}class="active"{% endif %}>· 我的收藏</a></li>
             <li><a href="{% url 'user:address' %}" {% if page == 'address' %}class="active"{% endif %}>· 收货地址</a></li>
         </ul>
     </div>

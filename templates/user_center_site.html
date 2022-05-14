@@ -6,7 +6,7 @@
 					<dl>
 						<dt>当前地址：</dt>
                         {% if address %}
-						    <dd>{{ address.addr }} （{{ address.receiver }} 收） {{ address.phone }}</dd>
+						    <dd>{{ address.address }} （{{ address.receiver }} 收） {{ address.phone }}</dd>
                         {% else %}
                             <dd>无默认收货地址</dd>
                         {% endif %}
@@ -32,9 +32,9 @@
 							<label>手机：</label>
 							<input type="text" name="phone">
 						</div>
-
 						<input type="submit" value="提交" class="info_submit">
 					</form>
+                    {{ errmsg }}
 				</div>
 		</div>
 {% endblock right_content %}

@@ -2,9 +2,9 @@
 {% block title %}天天图书-商品列表{% endblock title %}
 {% block main_content %}
 	<div class="breadcrumb">
-		<span>全部分类<span>
+		<span>全部分类</span>
 		<span>></span>
-		<span>{{ goods_type.goods_type }}<span>
+		<span>{{ goods_type.goods_type }}</span>
 	</div>
 
 	<div class="main_wrap clearfix">
@@ -21,7 +21,7 @@
 							{% endif %}
 							{% endfor %}
 						</a>
-						<h4><a href="{% url 'goods:detail' sku.spu.id sku.id %}">{{ sku.name }}</a></h4>
+						<h4><a href="{% url 'goods:detail' sku.spu.id sku.id %}">{{ sku.spu.name }}</a></h4>
 						<div class="prize">￥{{ sku.price }}</div>
 					</li>
                     {% endfor %}
@@ -46,7 +46,7 @@
 						{% endif %}
 						{% endfor %}
 					</a>
-					<h4><a href="{% url 'goods:detail' sku.spu.id sku.id %}">{{ sku.name }}</a></h4>
+					<h4><a href="{% url 'goods:detail' sku.spu.id sku.id %}">{{ sku.spu.name }}</a></h4>
 					<div class="operate">
 						<span class="prize">￥{{ sku.price }}</span>
 						<span class="unit">{{ sku.unite }}</span>

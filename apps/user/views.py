@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, HttpResponse
+from django.http import JsonResponse
 from django.urls import reverse
 from django.views.generic import View
 from django.conf import settings
@@ -11,7 +12,7 @@ from itsdangerous.exc import SignatureExpired
 import re
 
 from .tasks import send_register_active_email
-from .models import User, Address
+from .models import User, Address, UserFavorite
 from apps.goods.models import GoodsSKU, GoodsImage
 from apps.order.models import OrderInfo, OrderGoods
 
@@ -245,26 +246,30 @@ class AddressView(LoginRequiredMixin, View):
         """地址的添加"""
         # 接收数据
         receiver = request.POST.get('receiver')
-        address = request.POST.get('addr')
+        addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
         phone = request.POST.get('phone')
-        # 校验数据 判断数据完整性
-        if not all([receiver, address, phone]):
-            return render(request, 'user_center_site.html', {'errmsg': '数据不完整'})
-        # 校验手机号
-        if not re.match(r'^1[356789]\d{9}$', phone):
-            return render(request, 'user_center_site.html', {'errmsg': '请填写正确的手机号'})
+
         # 业务处理 地址添加 如果用户已存在默认地址 不作为默认地址添加 反之作为默认地址添加
         user = request.user
-        if Address.objects.get_default_address(user):
+        address = Address.objects.get_default_address(user)
+        if address is not None:
             is_default = False
         else:
             is_default = True
+
+        # 校验数据 判断数据完整性
+        if not all([receiver, address, phone]):
+            return render(request, 'user_center_site.html', {'errmsg': '数据不完整', 'page': 'address', 'address': address})
+        # 校验手机号
+        if not re.match(r'^1[356789]\d{9}$', phone):
+            return render(request, 'user_center_site.html', {'errmsg': '请填写正确的手机号', 'page': 'address', 'address': address})
+        
         # 添加地址
-        print(user, receiver, address, zip_code, phone, is_default)
+        # print(user, receiver, address, zip_code, phone, is_default)
         Address.objects.create(user=user,
                                receiver=receiver,
-                               address=address,
+                               address=addr,
                                zip_code=zip_code,
                                phone=phone,
                                is_default=is_default)
@@ -273,6 +278,56 @@ class AddressView(LoginRequiredMixin, View):
 
 
 class FavoriteView(LoginRequiredMixin, View):
-    def get(request):
-        return HttpResponse('get 用户收藏')
+    def get(self, request, page):
+        user = request.user
+        user_favorites = UserFavorite.objects.filter(user=user, is_delete=False).order_by('-create_time')
+
+        # 分页
+        paginator = Paginator(user_favorites, 4)
+        if page > paginator.num_pages:
+            page = 1
+        # 获取page页的Page实列对象
+        user_favorites_page = paginator.page(page)
+        # 进行页码控制 页面上最多显示5个页码
+        num_pages = paginator.num_pages
+        if num_pages < 5:
+            pages = range(1, num_pages + 1)
+        elif page <= 3:
+            pages = range(1, 6)
+        elif num_pages - page <= 2:
+            pages = range(num_pages - 4, num_pages + 1)
+        else:
+            pages = range(page - 2, page + 3)
+
+        for user_favorite in user_favorites_page:
+            try:
+                user_favorite.sku.images = GoodsImage.objects.filter(sku=user_favorite.sku)
+            except GoodsSKU.DoesNotExist:
+                pass
+            except GoodsImage.DoesNotExist:
+                pass
+
+        # 组织上下文
+        context = {
+            'page': 'favorite',
+            'user_favorites_page': user_favorites_page,
+            'pages': pages,
+        }
+        return render(request, 'user_center_favorite.html', context)
+
+    def post(self, request):
+        sku_id = request.POST.get('sku_id')
+        try:
+            sku = GoodsSKU.objects.get(pk=sku_id)
+        except GoodsSKU.DoesNotExist:
+            return JsonResponse({'code': 400, 'msg': '收藏失败！'})
+        try:
+            UserFavorite.objects.get(sku_id=sku_id)
+            return JsonResponse({'code': 300, 'msg': '商品已收藏'})
+        except UserFavorite.DoesNotExist:
+            pass
+        user = request.user
+        UserFavorite.objects.create(user=user, sku=sku)
+        return JsonResponse({'code': 200, 'msg': '收藏成功！'})
+
 

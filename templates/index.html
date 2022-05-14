@@ -15,8 +15,6 @@
 				<li><a href="{% url 'goods:index' %}">首页</a></li>
 				<li class="interval">|</li>
 				<li><a href="#">热销</a></li>
-				<li class="interval">|</li>
-				<li><a href="#">抽奖</a></li>
 			</ul>
 		</div>
 	</div>
@@ -43,6 +41,7 @@
             {% endfor %}
 		</div>
 	</div>
+
     {% for goods_type in goods_types %}
 	<div class="list_model">
 		<div class="list_title clearfix">

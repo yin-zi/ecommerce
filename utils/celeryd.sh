@@ -12,8 +12,8 @@ CELERYD_NODES="worker"
 #CELERYD_NODES=10
 
 # Absolute or relative path to the 'celery' command:
-CELERY_BIN="/usr/local/bin/celery"
-#CELERY_BIN="/virtualenvs/def/bin/celery"
+# CELERY_BIN="/usr/local/bin/celery"
+CELERY_BIN="/home/yyy/ecommerce/venv/bin"
 
 # App instance to use
 # comment out this line if you don't use an app
@@ -22,7 +22,7 @@ CELERY_APP="ecommerce"
 #CELERY_APP="proj.tasks:app"
 
 # Where to chdir at start. 更改为django项目目录
-CELERYD_CHDIR="/opt/Myproject/"
+CELERYD_CHDIR="/home/yyy/ecommerce"
 
 # Extra command-line arguments to the worker
 CELERYD_OPTS="--time-limit=300 --concurrency=8"

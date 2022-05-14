@@ -22,7 +22,7 @@
             <img src="{{ img.image.url }}" alt="商品图片"></li>
             {% endif %}
             {% endfor %}
-		<li class="col03">{{ sku.name }}<br><em>{{ sku.price }}元/{{ sku.unite }}</em></li>
+		<li class="col03">{{ sku.spu.name }}<br><em>{{ sku.price }}元/{{ sku.unite }}</em></li>
 		<li class="col04">{{ sku.unite }}</li>
 		<li class="col05">{{ sku.price }}元</li>
 		<li class="col06">
@@ -96,7 +96,7 @@
             let all_len = $('.cart_list_td').length;
             //获取页面上被选中的商品的数目
             let checked_len = $('.cart_list_td').find(':checked').length;
-            let is_checked = true;
+            let is_checked = true;  //默认设置为全选
             if (checked_len < all_len) {
                 is_checked = false;
             }

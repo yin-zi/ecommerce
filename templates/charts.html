@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Awesome-pyecharts</title>
+    <script src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+
+</head>
+<body>
+<div id="bar" style="width:1000px; height:600px;"></div>
+<div id="pie" style="width:1000px; height:600px;"></div>
+<script>
+    var chart = echarts.init(document.getElementById('bar'), 'white', {renderer: 'canvas'});
+    var piechart = echarts.init(document.getElementById('pie'), 'white', {renderer: 'canvas'});
+    $(
+        function () {
+            fetchData("http://127.0.0.1:8000/chart/bar/",chart);
+            fetchData("http://127.0.0.1:8000/chart/pie/",piechart);
+        }
+    );
+
+    function fetchData(charturl,chart) {
+        $.ajax({
+            type: "GET",
+            url: charturl,
+            dataType: 'json',
+            success: function (result) {
+                chart.setOption(result.data);
+            }
+        });
+    }
+</script>
+</body>
+</html>

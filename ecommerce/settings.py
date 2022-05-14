@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'apps.order.apps.OrderConfig',
     'apps.goods.apps.GoodsConfig',
     'apps.captcha.apps.CaptchaConfig',
+    'apps.captcha.apps.CaptchaConfig',
     'tinymce',
     'haystack',
     'django.contrib.admin',
@@ -204,48 +205,48 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'  # 当添
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5  # 控制搜索结果每页显示的数量
 
 # 日志
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,  # 是否禁用已经存在的日志记录器
-    'formatters': {  # 日志信息的文本格式
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {module} {lineno} {message}',
-            'style': '{',
-        },
-    },
-    'filters': {  # 在日志记录从logger传到handler的过程中进行过滤
-        'require_debug_true': {  # django在debug模式下才输出日志
-            '()': 'django.utils.log.RequireDebugTrue',
-        },
-    },
-    'handlers': {  # 处理logger中每一条消息的引擎
-        'console': {  # 向终端输出日志
-            'level': 'WARNING',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'file': {  # 向文件输出日志
-            'level': 'WARNING',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs/debug.log',
-            'formatter': 'verbose',
-            'maxBytes': 100 * 1024 * 1024,  # 日志文件大小100M
-            'backupCount': 3,  # 日志备份文件个数
-        },
-    },
-    'loggers': {  # 日志系统的入口
-        'django': {
-            'handlers': ['console', 'file'],  # 同时向终端和文件输出日志
-            'level': 'WARNING',  # 日志记录器接收的日志最低级别
-            'propagate': True,  # 是否继续传递日志信息
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,  # 是否禁用已经存在的日志记录器
+#     'formatters': {  # 日志信息的文本格式
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {module} {lineno} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'filters': {  # 在日志记录从logger传到handler的过程中进行过滤
+#         'require_debug_true': {  # django在debug模式下才输出日志
+#             '()': 'django.utils.log.RequireDebugTrue',
+#         },
+#     },
+#     'handlers': {  # 处理logger中每一条消息的引擎
+#         'console': {  # 向终端输出日志
+#             'level': 'WARNING',
+#             'filters': ['require_debug_true'],
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple'
+#         },
+#         'file': {  # 向文件输出日志
+#             'level': 'WARNING',
+#             'class': 'logging.handlers.RotatingFileHandler',
+#             'filename': BASE_DIR / 'logs/debug.log',
+#             'formatter': 'verbose',
+#             'maxBytes': 100 * 1024 * 1024,  # 日志文件大小100M
+#             'backupCount': 3,  # 日志备份文件个数
+#         },
+#     },
+#     'loggers': {  # 日志系统的入口
+#         'django': {
+#             'handlers': ['console', 'file'],  # 同时向终端和文件输出日志
+#             'level': 'WARNING',  # 日志记录器接收的日志最低级别
+#             'propagate': True,  # 是否继续传递日志信息
+#         },
+#     },
+# }
 
 """
 # 其它命令
@@ -267,6 +268,4 @@ qoqamp8198@sandbox.com
 
 # todo:fix-bug
 首页焦点图 只有一张会左右切换会有白屏
-
-商品详情页 立即购买 按钮点击不跳转(考虑是否删除此按钮
 """

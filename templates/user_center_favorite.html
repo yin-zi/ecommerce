@@ -1,0 +1,74 @@
+{% extends 'base_user_center.html' %}
+{% load static %}
+{% block right_content %}
+<div class="right_content clearfix">
+
+
+    <h3 class="common_title2">我的收藏</h3>
+    <div class="has_view_list">
+        <ul class="goods_type_list clearfix">
+            {% for user_favorite in user_favorites_page %}
+                <li>
+                    <a href="{% url 'goods:detail' user_favorite.sku.spu.id user_favorite.sku.id %}">
+                        {% for goods_img in user_favorite.sku.images %}
+                        {% if forloop.counter == 1 %}
+                        <img src="{{ goods_img.image.url }}">
+                        {% endif %}
+                        {% endfor %}
+                    </a>
+                    <h4><a href="{% url 'goods:detail' user_favorite.sku.spu.id user_favorite.sku.id %}">{{ user_favorite.sku.spu.name }}</a></h4>
+                    <div class="operate">
+                        {% csrf_token %}
+                        <span class="prize">￥{{ user_favorite.sku.price }}</span>
+                        <span class="unit">{{ user_favorite.sku.unite }}</span>
+                        <a href="javascript:;" sku_id="{{ user_favorite.sku.id }}"  class="con_btn" style="width: 70px;border: 1px solid #333333;margin-left: 10px; border-radius: 5px; color: #666">取消收藏</a>
+                    </div>
+                </li>
+            {% empty %}
+                无收藏记录
+            {% endfor %}
+
+
+            <div class="pagenation" style="margin-top: 300px">
+                {% if user_favorites_page.has_previous %}
+                <a href="{% url 'user:favorite' user_favorites_page.previous_page_number %}">上一页</a>
+                {% endif %}
+                {% for pindex in pages %}
+                    {% if pindex == order_page.number %}
+                        <a href="{% url 'user:favorite' pindex %}" class="active">{{ pindex }}</a>
+                    {% else %}
+                        <a href="{% url 'user:favorite' pindex %}">{{ pindex }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if user_favorites_page.has_next %}
+                <a href="{% url 'user:favorite' user_favorites_page.next_page_number %}">下一页></a>
+                {% endif %}
+            </div>
+
+        </ul>
+    </div>
+</div>
+{% endblock right_content %}
+{% block bottomfiles %}
+	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+	<script type="text/javascript">
+     // 收藏按钮
+        $('.con_btn').each(function() {
+            // 获取商品id
+            let sku_id = $(this).attr('sku_id');
+            let csrf = $('input[name="csrfmiddlewaretoken"]').val();
+            // 组织参数
+            let params = {'sku_id': sku_id, 'csrfmiddlewaretoken': csrf};
+            // 发起ajax post请求 访问/user/favorite
+            //console.log(params)
+            $(this).click(function () {
+                $.post('/user/favorite/', params, function (data) {
+                    if (data.code == 300) {
+                        alert(data.msg);
+                        location.reload()
+                    }
+                });
+                });
+            })
+	</script>
+{% endblock bottomfiles %}

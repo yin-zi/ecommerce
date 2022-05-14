@@ -12,4 +12,5 @@ urlpatterns = [
     path('order/<int:page>', views.UserOrderView.as_view(), name='order'),  # 用户中心-订单页
     path('address/', views.AddressView.as_view(), name='address'),  # 用户中心-地址页
     path('favorite/', views.FavoriteView.as_view(), name='favorite'),  # 用户收藏
+    path('favorite/<int:page>', views.FavoriteView.as_view(), name='favorite'),  # 用户收藏
 ]
