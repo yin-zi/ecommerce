@@ -1,5 +1,6 @@
 venv
 whoosh_index
+.gitignore
 */__pycache__
 *.pyc
 *.rdb
